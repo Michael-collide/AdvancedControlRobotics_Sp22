@@ -18,9 +18,15 @@ m, n = HP.shape
 X = HP[:,0].reshape(n-1,m)
 Y = HP[:,1].reshape(1,m)
 
+
 # Change array type to float
 X = X.astype('float64')
 Y = Y.astype('float64')
+
+# normalize X
+X = X-0.5*np.max(X)-0.5*np.min(X)
+
+X = X/np.sqrt(np.mean(X**2))
 
 # Add the dummy feature 1 to X
 X = np.concatenate((np.ones((1,m),dtype=float),X),axis=0)
@@ -29,8 +35,8 @@ X = np.concatenate((np.ones((1,m),dtype=float),X),axis=0)
 w = np.zeros((n,1),dtype=float)
 
 # The learning parameter in linear regression is the leraning rate
-alpha = 0.000001  # This parameter should be optimized
-Imax  = 2000      # Maximum number of iterations
+alpha = 0.04  # This parameter should be optimized
+Imax  = 2000      # Number of iterations
 
 # Run the batch gradient descent algorithm
 
@@ -40,7 +46,7 @@ dJ = np.zeros((n,Imax),dtype=float)
 fig4, ax4 = plt.subplots()
 ax4.scatter(X[1,:],Y)
 
-for t in range(2000):
+for t in range(Imax):
     
     Ypred = np.dot(np.transpose(w),X)
     
@@ -54,11 +60,10 @@ for t in range(2000):
     
     w -= alpha*dJ_stoc
     
-    if t%100 == 0:
+    if t%(Imax-1) == 0:
         ax4.plot(X[1,:],Ypred.reshape(61,))
 
-print(w)
-print(J[-1])
+
 J = J.reshape(Imax,1)
 fig1, ax1 = plt.subplots()
 ax1.plot(np.arange(len(J)),np.log(J))
@@ -68,7 +73,6 @@ ax2.plot(np.arange(len(J)),dJ[0,:])
 
 fig3, ax3 = plt.subplots()
 ax3.plot(np.arange(len(J)),dJ[1,:])
-plt.show()
 
 
 

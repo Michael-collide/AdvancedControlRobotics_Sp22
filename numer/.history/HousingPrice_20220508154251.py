@@ -34,9 +34,10 @@ import matplotlib.pyplot as plt
 
 HP = pd.read_excel (r'new apartment prices in Longgang District.xlsx')
 HP = pd.DataFrame(HP, columns= ['SIZE(M2)','PRICE(10000RMB)'])
-print ("HP is :",HP)
+print (HP)
 
-HP = HP.to_numpy(copy=True)
+HP = HP.to_numpy()
+print(HP.shape)
 
 # number of examples in the training set and features + label 
 m, n = HP.shape
@@ -45,26 +46,30 @@ m, n = HP.shape
 X = HP[:,0].reshape(n-1,m)
 Y = HP[:,1].reshape(1,m)
 
-# print(X.shape)
-# print(X.dtype)
+print(X.shape)
+print(X.dtype)
 
 # Change array type to float
 X = X.astype('float64')
 Y = Y.astype('float64')
-# print(X.dtype)
+print(X.dtype)
+
+# normalize X - Try to run the code without this normalization and
+# compare the final cost function with the normal form equation results
+X = X-0.5*np.max(X)-0.5*np.min(X)
+
+X = X/np.sqrt(np.mean(X**2))
 
 # Add the dummy feature 1 to X
 X = np.concatenate((np.ones((1,m),dtype=float),X),axis=0)
-# print(X.shape)
+print(X.shape)
 
 # Initialize the weights
 w = np.zeros((n,1),dtype=float)
 
 # The learning parameter in linear regression is the leraning rate
-# alpha = 0.000001  # This parameter should be optimized
-alpha = 0.0002005  # This parameter should be optimized
-
-Imax  = 2000      # Maximum number of iterations
+alpha = 1.28  # This parameter should be optimized
+Imax  = 491      # Maximum number of iterations
 
 # Run the batch gradient descent algorithm
 
@@ -73,9 +78,8 @@ dJ = np.zeros((n,Imax),dtype=float)
 
 fig4, ax4 = plt.subplots()
 ax4.scatter(X[1,:],Y)
-# ax4.set_title("The iteration result(every 100 times)"+"when $\\alpha$="+str(alpha))
 
-for t in range(2000):
+for t in range(Imax):
     
     Ypred = np.dot(np.transpose(w),X)
     
@@ -85,26 +89,31 @@ for t in range(2000):
     
     w -= alpha*dJ[:,t:t+1]
     
-    # if t%100 == 0:
-        # ax4.plot(X[1,:],Ypred.reshape(61,))
+    if t%49 == 0:
+        ax4.plot(X[1,:],Ypred.reshape(61,))
+#        input("Press Enter to continue...")
+
+plt.show
 
 J = J.reshape(Imax,1)
-print(w)
+
 fig1, ax1 = plt.subplots()
-ax1.plot(np.arange(len(J)),J)
-# ax1.set_title("The $J_{min}$ result is (batch gradient descent) "+str(J[-1]))
-ax1.legend(["Learning rate is $\\alpha$="+str(alpha)], loc = 'upper right')
-ax4.plot(X[1,:],Ypred.reshape(61,))
-ax4.set_title("Using batch-gradient-descent")
+ax1.plot(np.arange(len(J)),np.log(J))
+
 fig2, ax2 = plt.subplots()
 ax2.plot(np.arange(len(J)),dJ[0,:])
-ax2.set_title("The $d(J)[0,:]$ result"+"$\\alpha$="+str(alpha))
 
 fig3, ax3 = plt.subplots()
 ax3.plot(np.arange(len(J)),dJ[1,:])
-ax3.set_title("The dJ[1,:] result"+"$\\alpha$="+str(alpha))
-plt.show()
-print(J[-1])
+
+
+
+
+
+
+
+
+
 
 
 

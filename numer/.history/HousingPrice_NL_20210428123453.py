@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri Apr 16 16:44:30 2021
+Created on Fri Apr 16 17:10:46 2021
+
 @author: Vik Gupta
 """
 
@@ -22,14 +23,15 @@ Y = HP[:,1].reshape(1,m)
 X = X.astype('float64')
 Y = Y.astype('float64')
 
-# Add the dummy feature 1 to X
-X = np.concatenate((np.ones((1,m),dtype=float),X),axis=0)
+# Add the dummy feature 1 to X , now also add sqrt(X) as a feature
+X = np.concatenate((np.ones((1,m),dtype=float),X,X**0.5),axis=0)
+n = X.shape[0]
 
 # Initialize the weights
 w = np.zeros((n,1),dtype=float)
 
 # The learning parameter in linear regression is the leraning rate
-alpha = 0.000001  # This parameter should be optimized
+alpha = 0.00004  # This parameter should be optimized
 Imax  = 2000      # Maximum number of iterations
 
 # Run the batch gradient descent algorithm
@@ -37,10 +39,7 @@ Imax  = 2000      # Maximum number of iterations
 J  = np.zeros((1,Imax),dtype=float)
 dJ = np.zeros((n,Imax),dtype=float)
 
-fig4, ax4 = plt.subplots()
-ax4.scatter(X[1,:],Y)
-
-for t in range(2000):
+for t in range(100):
     
     Ypred = np.dot(np.transpose(w),X)
     
@@ -48,17 +47,8 @@ for t in range(2000):
     
     dJ[:,t:t+1] = np.mean((Ypred-Y)*X,axis=1).reshape(n,1)
     
-    rI      = np.random.randint(0,60)
-    dJ_stoc = np.mean((Ypred[:,rI:rI+1]-Y[:,rI:rI+1])*X[:,rI:rI+1],
-                      axis=1).reshape(n,1)
-    
-    w -= alpha*dJ_stoc
-    
-    if t%100 == 0:
-        ax4.plot(X[1,:],Ypred.reshape(61,))
+    w -= alpha*dJ[:,t:t+1]
 
-print(w)
-print(J[-1])
 J = J.reshape(Imax,1)
 fig1, ax1 = plt.subplots()
 ax1.plot(np.arange(len(J)),np.log(J))
@@ -68,21 +58,6 @@ ax2.plot(np.arange(len(J)),dJ[0,:])
 
 fig3, ax3 = plt.subplots()
 ax3.plot(np.arange(len(J)),dJ[1,:])
-plt.show()
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+fig4, ax4 = plt.subplots()
+ax4.plot(np.arange(len(J)),dJ[2,:])
